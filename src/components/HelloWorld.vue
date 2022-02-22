@@ -1,24 +1,14 @@
 <script lang="ts" setup>
     import { ref, onMounted } from 'vue'
-    import { defineComponent } from 'vue'
 
     defineProps<{ msg: string }>()
 
     const count = ref(0)
-    function a(name) {
-
-    }
-    const c = 1
-    if (c==2) {
-        console.log(2)
-    }
+    // const c = 1
     onMounted(() => {
         const e: HTMLElement | null = document.getElementById('a')
         console.log(e)
     })
-
-
-    type a = String
 </script>
 
 <template>

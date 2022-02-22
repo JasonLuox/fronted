@@ -7,7 +7,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint --ext .js,.vue,.ts src",
-    "eslint": "npx eslint ./src/**/*.vue --fix"
+    "lint:fix": "npx eslint ./src/**/*.vue --fix"
   },
   "husky": {
     "hooks": {
@@ -29,7 +29,7 @@
     "@vitejs/plugin-vue": "^2.2.0",
     "eslint": "^8.9.0",
     "eslint-plugin-vue": "^8.5.0",
-    "husky": "^7.0.4",
+    "husky": "^4.3.8",
     "lint-staged": "^12.3.4",
     "typescript": "^4.5.4",
     "vite": "^2.8.0",

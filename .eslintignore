@@ -1,6 +1,4 @@
 /build/
-/config/
 /dist/
-*.js
-
 /node_modules/
+*.js

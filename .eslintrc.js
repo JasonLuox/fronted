@@ -1,35 +1,34 @@
 module.exports = {
+    root: true,
     env: {
         browser: true,
         es2021: true,
         node: true,
     },
     extends: [
-        'plugin:vue/recommended',
-        '@vue/typescript/recommended'
-        // 'airbnb-base',  // airbnb-base, airbnb规范，https://github.com/airbnb/javascript
-        // standard https://github.com/standard/eslint-config-standard
+        'plugin:vue/vue3-recommended',
+        'plugin:@typescript-eslint/recommended'
     ],
     /*
     * 解决引入ts文件import xxx (不带文件后缀) eslint报错问题
     * https://stackoverflow.com/questions/55198502/using-eslint-with-typescript-unable-to-resolve-path-to-module
     * */
-    settings: {
-        "import/resolver": {
-            "node": {
-                "paths": ["src"],
-                "extensions": [".js", ".jsx", ".ts", ".tsx"]
-            }
-        }
-    },
+    // settings: {
+    //     "import/resolver": {
+    //         "node": {
+    //             "paths": ["src"],
+    //             "extensions": [".js", ".jsx", ".ts", ".tsx"]
+    //         }
+    //     }
+    // },
+    parser: "vue-eslint-parser",
     parserOptions: {
-        ecmaVersion: 12,
         parser: '@typescript-eslint/parser',
-        sourceType: 'module',
+        ecmaVersion: "latest",
+        sourceType: 'module'
     },
     plugins: [
-        'vue',
-        '@typescript-eslint',
+        '@typescript-eslint'
     ],
     rules: {
         // 使用单引号
@@ -239,20 +238,8 @@ module.exports = {
         'prefer-const': 'error',
 
         // eslint-plugin-vue@7 新增的规则，暂时先全部关闭
-        'vue/no-dupe-v-else-if': 'off',
-        'vue/component-definition-name-casing': 'off',
-        'vue/one-component-per-file': 'off',
-        'vue/v-slot-style': 'off',
-        'vue/no-arrow-functions-in-watch': 'off',
-        'vue/no-custom-modifiers-on-v-model': 'off',
-        'vue/no-multiple-template-root': 'off',
-        'vue/no-mutating-props': 'off',
-        'vue/no-v-for-template-key': 'off',
-        'vue/no-v-model-argument': 'off',
-        'vue/valid-v-bind-sync': 'off',
-        'vue/valid-v-slot': 'off',
+        'vue/valid-v-slot': 'error',
         'vue/experimental-script-setup-vars': 'off',
-        'vue/no-lone-template': 'off',
 
         // 不允许数组括号内有空格
         // https://github.com/vuejs/eslint-plugin-vue/blob/master/docs/rules/array-bracket-spacing.md
@@ -1308,7 +1295,23 @@ module.exports = {
             // good code
             <div v-text="foo"/>
         */
-        'vue/valid-v-text': 'error'
+        'vue/valid-v-text': 'error',
+        'vue/script-setup-uses-vars': 'error',
+        // typescript-eslint 配置
+        '@typescript-eslint/ban-ts-ignore': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-empty-function': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/ban-types': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        '@typescript-eslint/no-unused-vars': [
+            'error',
+            {
+                argsIgnorePattern: '^_',
+                varsIgnorePattern: '^_',
+            },
+        ]
     },
     overrides: [
         {
@@ -1318,4 +1321,4 @@ module.exports = {
             }
         }
     ]
-};
+}
