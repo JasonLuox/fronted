@@ -1,0 +1,9 @@
+# 其他类型文件
+*.js
+*.ts
+*.jpg
+*.woff
+
+# 测试和打包目录
+/dist/
+/node_modules/
