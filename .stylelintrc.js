@@ -211,7 +211,10 @@ module.exports = {
         "unit-case": "lower",
         
         // 禁止使用未知单位
-        "unit-no-unknown": true
+        "unit-no-unknown": true,
+        "color-function-notation": null,
+        "alpha-value-notation": null,
+        "property-no-vendor-prefix": null
     },
     "ignoreFiles": ['**/*.js', '**/*.jsx', '**/*.tsx', '**/*.ts']
 }

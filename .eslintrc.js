@@ -1297,6 +1297,7 @@ module.exports = {
         */
         'vue/valid-v-text': 'error',
         'vue/script-setup-uses-vars': 'error',
+        'vue/multi-word-component-names': 'off',
         // typescript-eslint 配置
         '@typescript-eslint/ban-ts-ignore': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
