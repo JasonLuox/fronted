@@ -1,6 +1,6 @@
 import Axios, {AxiosError, AxiosResponse, AxiosRequestConfig} from 'axios'
 
-const BASE_URL = 'https://api.github.com'
+const BASE_URL = 'http://localhost:4000/'
 const TIME_OUT = 10 * 1000
 
 /**
@@ -54,14 +54,13 @@ instance.interceptors.response.use(
             errorHandle(error.response.status, error.response)
             return Promise.reject(error.response)
         }
-        console.log('网络请求失败, 请刷新重试')
         return Promise.reject(error)
     }
 )
 
 const getPromise = (method, url, params, config = {}) => {
     return new Promise((resolve, reject) => {
-        instance[method](method, url)(params, config).catch(e => e.response.data)
+        instance[method](url)(params, config).catch(e => e.response.data)
             .then(res => resolve(res))
             .catch(err => reject(err))
     })

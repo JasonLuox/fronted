@@ -2,6 +2,7 @@
     import { onMounted } from 'vue'
     import { useCounterStore } from '@/stores/counter'
     import { $echarts, ECOption } from '@/utils/echarts'
+    import testAxios from '@/views/test-axios.vue'
 
     const counter = useCounterStore()
 
@@ -45,5 +46,6 @@
     </n-button>
     <div @click="counter.increment()">累加器{{ count }}</div>
     <div id="echarts" style="width: 400px;height: 200px;"></div>
+    <test-axios></test-axios>
 </template>
 
