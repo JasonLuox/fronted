@@ -1,5 +1,10 @@
 import Axios, {AxiosError, AxiosResponse, AxiosRequestConfig} from 'axios'
 
+interface IResponseData extends IUnknowObject {
+    code: number;
+    total?: number;
+}
+
 const BASE_URL = 'https://api.github.com'
 const TIME_OUT = 10 * 1000
 
@@ -59,16 +64,9 @@ instance.interceptors.response.use(
     }
 )
 
-const getPromise = (method, url, params, config = {}) => {
-    return new Promise((resolve, reject) => {
-        instance[method](method, url)(params, config).catch(e => e.response.data)
-            .then(res => resolve(res))
-            .catch(err => reject(err))
-    })
-}
+const get = (url: string, params?: any): Promise<IResponseData> => instance.get(url, { params })
+const post = (url: string, params: any, config?: AxiosRequestConfig): Promise<IResponseData> => instance.post(url, params, config)
 
-const get = (url: string, params?: any) => getPromise('get', url, { params })
-const post = (url: string, params: any, config?: AxiosRequestConfig) => getPromise('post', url, params, config)
 
 export {
     get,
