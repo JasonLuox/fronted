@@ -27,20 +27,20 @@ const instance = Axios.create({
 /**
  * 错误处理函数
  */
-const errorHandle = (code: number, error): IResponseError => {
-    // HTTP状态码判断
-    const errorMsgHandler = (response) => {
-        return {
-            400: response?.data?.message || '400 error 请求无效',
+const errorHandle = (error): IResponseError => {
+    const errorMsgHandler = (code, data) => {
+        const msgMap = {
+            400: data?.message || '400 error 请求无效',
             401: '401 error 登录失效，请重新登录！',
             403: '403 error 对不起，你没有访问权限！',
             404: '404 Not Found',
-            500: response?.data?.message || '500 error 后台错误，请联系管理员',
-            502: response?.data?.message || '502 error 平台环境异常'
+            500: data?.message || '500 error 后台错误，请联系管理员',
+            502: data?.message || '502 error 平台环境异常'
         }
+        return msgMap[code]
     }
     const { data, status, statusText } = error.response
-    const msg = errorMsgHandler(error.response)[code] || `${status} error ${data ? data.message : statusText}`
+    const msg = errorMsgHandler(status, data) || `${status} error ${data ? data.message : statusText}`
     alert(msg)
     return {
         code: status,
@@ -76,10 +76,11 @@ instance.interceptors.request.use((config: AxiosRequestConfig) => {
 // 后置拦截器（获取到响应时的拦截）
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
-        if (String(response.status).indexOf('2') !== 0) {
+        const { data, status } = response
+        if (String(status).indexOf('2') !== 0) {
             return {
-                code: response.status,
-                message: response.data.message || '请求异常，请刷新重试',
+                code: status,
+                message: data.message || '请求异常，请刷新重试',
                 result: false
             }
         }
@@ -87,8 +88,7 @@ instance.interceptors.response.use(
     },
     (error: AxiosError) => {
         if (error.response) {
-            // 请求已发出，但是不在2xx的范围
-            errorHandle(error.response.status, error)
+            errorHandle(error)
         } else {
             return Promise.reject(error)
         }

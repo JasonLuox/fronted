@@ -20,7 +20,7 @@
     }
     const handleAxiosTest2 = async() => {
         const res = await ajaxGet('/test/2')
-        console.log(res?.data, 'hahaha')
+        console.log(res?.data, 'show res data')
         // ajaxGet('/test/2').then(res => {
         //     console.log(res.data, 'hahaha')
         // })
