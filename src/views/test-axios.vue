@@ -1,29 +1,43 @@
 <script lang="ts" setup>
-    import { onMounted } from 'vue'
+    import {onMounted, ref} from 'vue'
     import Axios from 'axios'
-    import {get} from '@/utils/axios'
+    // import {useRouter} from 'vue-router'
+    import {ajaxGet} from '@/utils/axios'
 
-    const handleAxiosTest = async() => {
-        const a = await Axios.get('/test/')
-        console.log(a, 'a')
-        // Axios.get('/test/').then(res => {
-        //     console.log(res, 'res')
-        // }).catch(err => {
-        //     console.log(err, 'err')
-        // })
+    // const router = useRouter()
+    const instance = Axios.create({
+        baseURL: 'http://127.0.0.1:8000/api',
+    })
+    const msg = ref('before')
+
+    const handleAxiosTest = () => {
+        instance.get('/test/').then(res => {
+            msg.value = res.data.data
+            console.log(msg)
+        }).catch(err => {
+            console.log(err, 'err')
+        })
     }
-    const handleAxiosTest2 = () => {
-        get('/test/')
+    const handleAxiosTest2 = async() => {
+        const res = await ajaxGet('/test/2')
+        console.log(res?.data, 'hahaha')
+        // ajaxGet('/test/2').then(res => {
+        //     console.log(res.data, 'hahaha')
+        // })
+        // console.log(router, 'show router')
+        // router.push({ name: 'Test' })
     }
 
     onMounted(() => {
-        // 测试echarts的引入
+        // handleAxiosTest()
     })
 
 </script>
 
 <template>
-    <div>hello  axios</div>
+    <div>{{ msg }}</div>
+    <div v-if="msg === 'after'">hags</div>
+    <div id="test"></div>
     <n-button type="tertiary" @click="handleAxiosTest">
         点我发送请求
     </n-button>
