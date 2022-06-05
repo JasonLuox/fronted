@@ -4,7 +4,7 @@ import router from './router/index'
 import { naive } from './utils/demand-import'
 import { createPinia } from 'pinia'
 // mock数据
-import './utils/mock'
+// import './utils/mock'
 
 const app = createApp(App as any)
 app.use(router)
