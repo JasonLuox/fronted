@@ -8,6 +8,8 @@
   </head>
   <body>
     <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/main.ts">
+        window.CSRF_COOKIE_NAME = 'my_vue_app'
+    </script>
   </body>
 </html>

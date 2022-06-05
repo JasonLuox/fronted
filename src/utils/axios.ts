@@ -1,76 +1,121 @@
-import Axios, {AxiosError, AxiosResponse, AxiosRequestConfig} from 'axios'
+import Axios, {
+    AxiosError,
+    AxiosResponse,
+    AxiosRequestConfig,
+    AxiosInstance
+} from 'axios'
 
-interface IResponseData extends IUnknowObject {
-    code: number;
-    total?: number;
+let controllers: AbortController[] = []
+
+const BASE_URL = 'http://127.0.0.1:4000/api'
+const TIME_OUT = 20 * 1000
+
+interface IResponseError {
+    code: number,
+    result: boolean,
+    message: string
 }
-
-const BASE_URL = 'https://api.github.com'
-const TIME_OUT = 10 * 1000
 
 /**
  * 创建axios实例
  */
-const instance = Axios.create({
+const instance: AxiosInstance = Axios.create({
     baseURL: BASE_URL,
     timeout: TIME_OUT
+    // withCredentials: true
 })
 
-const errorHandle = (status: number, error): void => {
-    // HTTP状态码判断
-    switch (status) {
-        case 401:
-            return alert(`Error Code: ${status}, Message: ${error.msg || '登录失效，请重新登录'}`)
-        case 403:
-            return alert(`Error Code: ${status}, Message: ${error.msg || '你没有访问权限'}`)
-        case 500:
-            return alert(`Error Code: ${status}, Message: ${error.msg || '后台错误，请联系管理员'}`)
-        case 502:
-            return alert(`Error Code: ${status}, Message: ${error.msg || '平台环境异常'}`)
-        default:
-            alert(`Error Code: ${status}, Message: ${error.msg || '未知错误，请刷新重试'}`)
-
+/**
+ * 错误处理函数
+ */
+const errorMsgHandler = (code, data): string | undefined => {
+    const { message } = data
+    const msgMap = {
+        400: message || '400 error 请求无效',
+        401: '401 error 登录失效，请重新登录！',
+        403: '403 error 对不起，你没有访问权限！',
+        404: '404 Not Found',
+        500: message || '500 error 后台错误，请联系管理员',
+        502: '502 error 平台环境异常'
     }
+    return msgMap[code]
+}
+
+const errorHandle = (error): IResponseError => {
+    const { data, status, statusText } = error.response
+    const msg = errorMsgHandler(status, data) || `${status} error ${data ? data.message : statusText}`
+    alert(msg)
+    return {
+        code: status,
+        result: false,
+        message: msg
+    }
+}
+
+/**
+ * 获取token，根据项目中后台的传递方式调整。这里使用的是cookie传递
+ * **/
+const getToken = (): string => {
+    const DEFAULT_X_CSRFTOKEN = 'NOT_PROVIDED'
+    const { cookie } = document
+    if (!cookie) return DEFAULT_X_CSRFTOKEN
+    // @ts-ignore
+    const key = window.CSRF_COOKIE_NAME || 'csrftoken'
+    const patten = new RegExp(`^${key}=[\S]*`, 'g')
+    const value = cookie.split(';')?.find((item) => patten.test(item.trim()))
+    if (!value) return DEFAULT_X_CSRFTOKEN
+    return decodeURIComponent(value.split('=')[1] || DEFAULT_X_CSRFTOKEN)
 }
 
 // 前置拦截器（发起请求之前的拦截）
-instance.interceptors.request.use(
-    (response) =>
-        /** * 根据你的项目实际情况来对 config 做处理 * 这里对 config 不做任何处理，直接返回 */
-        response,
-    (error) => Promise.reject(error)
-)
+instance.interceptors.request.use((config: AxiosRequestConfig) => {
+    config.headers && (config.headers['X-csrfToken'] = getToken())
+    const controller = new AbortController()
+    config.signal = controller.signal
+    controllers.push(controller)
+    return config
+})
 
 // 后置拦截器（获取到响应时的拦截）
 instance.interceptors.response.use(
-    (res: AxiosResponse) => {
-        if (String(res.status).indexOf('2') !== 0) {
-            return {
-                code: res.status,
-                message: res.data.message || '请求异常，请刷新重试',
-                result: false
-            }
+    (response: AxiosResponse) => {
+        const { data, status } = response
+        const { result, message } = data
+        // 请求正常时，仅返回需要用到的 data 信息即可
+        if (result)	return data
+        // 1、对于一些请求正常，但后台处理失败的内容进行拦截，返回对应错误信息
+        alert(message || '请求异常，请刷新重试')
+        return {
+            code: status,
+            message: message || '请求异常，请刷新重试',
+            result: false
         }
-        return Promise.reject(res.data)
     },
     (error: AxiosError) => {
-        if (error && error.response) {
-            // 请求已发出，但是不在2xx的范围
-            errorHandle(error.response.status, error.response)
-            return Promise.reject(error.response)
-        }
-        console.log('网络请求失败, 请刷新重试')
-        return Promise.reject(error)
+        return error.response ? errorHandle(error) : Promise.reject(error)
     }
 )
 
-const get = (url: string, params?: any): Promise<IResponseData> => instance.get(url, { params })
-const post = (url: string, params: any, config?: AxiosRequestConfig): Promise<IResponseData> => instance.post(url, params, config)
+export const cancelRequest = () => {
+    controllers.forEach(controller => {
+        controller.abort()
+    })
+    controllers = []
+}
+
+const ajaxGet = (url: string, params?: any): Promise<AxiosResponse> => instance.get(url, { params })
+const ajaxDelete = (url: string, params?: any): Promise<AxiosResponse> => instance.delete(url, { params })
+const ajaxPost = (url: string, params: any, config?: AxiosRequestConfig): Promise<AxiosResponse> => instance.post(url, params, config)
+const ajaxPut = (url: string, params: any, config?: AxiosRequestConfig): Promise<AxiosResponse> => instance.put(url, params, config)
+const ajaxPatch = (url: string, params: any, config?: AxiosRequestConfig): Promise<AxiosResponse> => instance.patch(url, params, config)
 
 
 export {
-    get,
-    post,
+    ajaxGet,
+    ajaxDelete,
+    ajaxPost,
+    ajaxPut,
+    ajaxPatch
 }
 
-export default instance
+// export default instance
